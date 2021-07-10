@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace Michsky.UI.Shift
 {
@@ -16,6 +17,8 @@ namespace Michsky.UI.Shift
         public bool disableSplashScreen;
         public bool enablePressAnyKeyScreen;
         public bool enableLoginScreen;
+
+        public UserChecker userExistsChecker;
 
         MainPanelManager mpm;
 
@@ -66,7 +69,21 @@ namespace Michsky.UI.Shift
         public void LoginScreenCheck()
         {
             if (enableLoginScreen == true && enablePressAnyKeyScreen == true)
-                splashScreenAnimator.Play("Press Any Key to Login");
+            {
+                userExistsChecker?.Invoke((isPresent=>
+                {
+                    if (isPresent)
+                    {
+                        splashScreenAnimator.Play("Loading");
+                        ssTimedEvent.StartIEnumerator();
+                    }
+                    else
+                    {
+                        splashScreenAnimator.Play("Press Any Key to Login");
+                    }
+                }));
+            }
+                
 
             else if (enableLoginScreen == false && enablePressAnyKeyScreen == true)
             {
@@ -81,4 +98,9 @@ namespace Michsky.UI.Shift
             }
         }
     }
+}
+
+[System.Serializable]
+public class UserChecker : UnityEvent<System.Action<bool>>
+{
 }
