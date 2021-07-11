@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System;
-
+using Realms;
 public class WebManager
 {
     public bool isLoading = false;
@@ -72,6 +73,7 @@ public class WebManager
     public IEnumerator RequestLevelCoroutine(string level,System.Action<Level,string> callback)
     {
         isLoading = true;
+        
         using(UnityWebRequest request = UnityWebRequest.Get(baseUrl + "/" + level))
         {
             yield return request.SendWebRequest();
@@ -87,6 +89,37 @@ public class WebManager
                 callback(levelObj, "");
             }
         }
+    }
+
+    public IEnumerator RequestAllChapters(System.Action<List<Chapter>,string> callback)
+    {
+        isLoading = true;
+        var token = GetApiKey();
+        if (token.Length <= 0)
+        {
+            callback(null, "No API KEY Found");
+            yield return "";
+        }
+        using (UnityWebRequest request = UnityWebRequest.Get(baseUrl+"/chapter/all/"+token))
+        {
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                callback(null, request.error);
+            }
+            else
+            {
+                ChapterResult result = JsonConvert.DeserializeObject<ChapterResult>(request.downloadHandler.text);
+                callback(result.chapters, "");
+            }
+        }
+    }
+
+    private string GetApiKey()
+    {
+        Realm realm = Realm.GetInstance();
+        var users = realm.All<GameUser>();
+        return users.Count() > 0 ? users.First().token : "";
     }
 
     public IEnumerator RequestCodeCompilation(string language,string code,System.Action<CompilationResult,string> callback)
@@ -108,6 +141,5 @@ public class WebManager
                 callback(result, "");
             }
         }
-
     }
 }

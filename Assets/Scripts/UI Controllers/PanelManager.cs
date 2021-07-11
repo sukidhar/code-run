@@ -23,16 +23,16 @@ public class PanelManager : MonoBehaviour
     public TMP_Text keyField;
     public TMP_Text statusField;
     public GameObject deathPanel;
+    public Michsky.UI.Shift.BlurManager blurManager;
 
     private GameObject gate;
-
+    
 
     private LeadController leadController;
     private Michsky.UI.Shift.HorizontalSelector languageSelectorScript;
     // Start is called before the first frame update
     void Start()
     {
-        deathPanel.SetActive(false);
         languageSelectorScript = languageSelector.GetComponent<Michsky.UI.Shift.HorizontalSelector>();
         leadController = lead.GetComponent<LeadController>();
         codePanel.SetActive(false);
@@ -67,7 +67,11 @@ public class PanelManager : MonoBehaviour
 
     public void OnDeathEvent()
     {
-        deathPanel.SetActive(true);
+
+        //Michsky.UI.Shift.ModalWindowManager manager = deathPanel.GetComponent<Michsky.UI.Shift.ModalWindowManager>();
+        //manager.Start();
+        //manager.ModalWindowIn();
+        //blurManager.BlurInAnim();
     }
 
 

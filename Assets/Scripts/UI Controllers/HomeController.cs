@@ -14,7 +14,7 @@ public class HomeController : MonoBehaviour
     public enum TabPanel
     {
         Home,
-        Progress,
+        Campaign,
         Settings
     }
     [Header("Login Flow Settings")]
@@ -155,8 +155,20 @@ public class HomeController : MonoBehaviour
 
     public void OnNewGameButtonClicked()
     {
-        mpm.OpenPanel(TabPanel.Progress.ToString());
+        mpm.OpenPanel(TabPanel.Campaign.ToString());
+        if (_realm.All<Chapter>().Count() > 0)
+        {
+            return;
+        }
+        StartCoroutine(webManager.RequestAllChapters((chapters, error) =>
+        {
+            chapters.ForEach(chapter =>
+            {
+                Debug.Log(chapter.id);
+            });
+        }));
     }
+
     public void OnEmailEditingEnded(string s)
     {
         if (Regex.IsMatch(s, emailRegex))

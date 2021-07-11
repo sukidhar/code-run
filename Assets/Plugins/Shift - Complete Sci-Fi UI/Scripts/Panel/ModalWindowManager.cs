@@ -20,10 +20,9 @@ namespace Michsky.UI.Shift
         Animator mWindowAnimator;
         bool isOn = false;
 
-        void Start()
+        public void Start()
         {
             mWindowAnimator = gameObject.GetComponent<Animator>();
-
             if (useCustomTexts == false)
             {
                 windowTitle.text = titleText;
@@ -37,7 +36,6 @@ namespace Michsky.UI.Shift
         {
             StopCoroutine("DisableWindow");
             gameObject.SetActive(true);
-
             if (isOn == false)
             {
                 if (sharpAnimations == false)
@@ -60,7 +58,6 @@ namespace Michsky.UI.Shift
 
                 isOn = false;
             }
-
             StartCoroutine("DisableWindow");
         }
 
