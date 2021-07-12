@@ -47,8 +47,11 @@ public class HomeController : MonoBehaviour
     //public Michsky.UI.Shift.MainButton tutorialButton;
     //public Michsky.UI.Shift.MainButton aboutButton;
 
+    [Header("Campaign Panel Setup")]
+    public GameObject chapterGameObject;
+    public GameObject chapterListPanel;
 
-
+    
     private Realm _realm;
     private string emailRegex = @"^([0-9a-zA-Z]" + @"([\+\-_\.][0-9a-zA-Z]+)*" + @")+" + @"@(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]*\.)+[a-zA-Z0-9]{2,17})$";
     private bool[] signUpCheckers = { false, false, false };
@@ -76,6 +79,72 @@ public class HomeController : MonoBehaviour
         passwordSupportText.gameObject.SetActive(false);
         signIn = signInButton.gameObject.GetComponent<Button>();
         signIn.interactable = false;
+        LoadChapters();
+    }
+
+    private void LoadChapters()
+    {
+        foreach (Transform child in chapterListPanel.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        var storedChapters = _realm.All<Chapter>().ToList();
+        if (storedChapters.Count() > 0)
+        {
+            storedChapters.Sort(new ChapterComparator());
+            AddGameObjectsToChapterListPanel(storedChapters);
+            return;
+        }
+        StartCoroutine(webManager.RequestAllChapters((chapters, error) =>
+        {
+            _realm.Write(() =>
+            {
+                chapters.ForEach(chapter =>
+                {
+                    _realm.Add(chapter, true);
+                });
+            });
+            AddGameObjectsToChapterListPanel(chapters.ToList());
+        }));
+    }
+
+    private void OnChapterSelected()
+    {
+        //todo check if the chapter is current chapter and show alert to set async scene operation to coroutine
+        splashScreen.GetComponent<Animator>().Play("Loading");
+        mainPanels.GetComponent<Animator>().Play("Invisible");
+        StartCoroutine(LoadSceneAsync("Level1"));
+    }
+
+    IEnumerator LoadSceneAsync(string scene)
+    {
+        yield return new WaitForSeconds(1.5f);
+        var loading = SceneManager.LoadSceneAsync(scene);
+        while (!loading.isDone)
+        {
+            yield return null;
+        }
+    }
+
+
+    private void AddGameObjectsToChapterListPanel(List<Chapter> storedChapters)
+    {
+        foreach (var storedChapter in storedChapters)
+        {
+            var chapter = Instantiate(chapterGameObject);
+            var chapterScript = chapter.GetComponent<Michsky.UI.Shift.ChapterButton>();
+            chapterScript.buttonTitle = storedChapter.title;
+            chapterScript.buttonDescription = storedChapter.description;
+            chapterScript.id = storedChapter.id;
+            chapterScript.enableStatus = true;
+            chapter.GetComponent<Button>().onClick.AddListener(delegate
+            {
+                OnChapterSelected();
+            });
+            chapterScript.statusItem = GetStatusItem(storedChapter);
+            chapter.transform.SetParent(chapterListPanel.transform);
+            chapter.transform.localScale = Vector3.one;
+        }
     }
 
     public void ClearSignUpText()
@@ -152,21 +221,48 @@ public class HomeController : MonoBehaviour
               });
         }));
     }
+    //public void OnNewGameButtonClicked()
+    //{
+    //    foreach (Transform child in chapterListPanel.transform)
+    //    {
+    //        Destroy(child.gameObject);
+    //    }
+    //    mpm.OpenPanel(TabPanel.Campaign.ToString());
+    //    var storedChapters = _realm.All<Chapter>().ToList();
+    //    if (storedChapters.Count() > 0)
+    //    {
+    //        storedChapters.Sort(new ChapterComparator());
+    //        AddGameObjectsToChapterListPanel(storedChapters);
+    //        return;
+    //    }
+    //    StartCoroutine(webManager.RequestAllChapters((chapters, error) =>
+    //    {
+    //        _realm.Write(() =>
+    //        {
+    //            chapters.ForEach(chapter =>
+    //            {
+    //                _realm.Add(chapter, true);
+    //            });
+    //        });
+    //        AddGameObjectsToChapterListPanel(chapters.ToList());
+    //    }));
+    //}
 
-    public void OnNewGameButtonClicked()
+
+
+    private Michsky.UI.Shift.ChapterButton.StatusItem GetStatusItem(Chapter chapter)
     {
-        mpm.OpenPanel(TabPanel.Campaign.ToString());
-        if (_realm.All<Chapter>().Count() > 0)
-        {
-            return;
+        switch (chapter.status){
+            case "UNLOCKED":
+                return Michsky.UI.Shift.ChapterButton.StatusItem.NONE;
+            case "CURRENT":
+                return Michsky.UI.Shift.ChapterButton.StatusItem.NONE;
+            case "LOCKED":
+                return Michsky.UI.Shift.ChapterButton.StatusItem.LOCKED;
+            default:
+                return Michsky.UI.Shift.ChapterButton.StatusItem.COMPLETED;
+
         }
-        StartCoroutine(webManager.RequestAllChapters((chapters, error) =>
-        {
-            chapters.ForEach(chapter =>
-            {
-                Debug.Log(chapter.id);
-            });
-        }));
     }
 
     public void OnEmailEditingEnded(string s)

@@ -24,6 +24,8 @@ namespace Michsky.UI.Shift
         Transform statusNone;
         Transform statusLocked;
         Transform statusCompleted;
+        [HideInInspector] public string id;
+
 
         public enum StatusItem
         {

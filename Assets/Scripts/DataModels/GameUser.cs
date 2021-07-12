@@ -25,3 +25,4 @@ public class GameUser : RealmObject
         this.email = email;
     }
 }
+

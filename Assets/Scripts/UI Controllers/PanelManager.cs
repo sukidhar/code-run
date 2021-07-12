@@ -7,22 +7,26 @@ using Michsky;
 
 public class PanelManager : MonoBehaviour
 {
+    [Header("Panels")]
+    public GameObject escapePanel;
+    public GameObject codePanel;
+    public GameObject deathPanel;
+
+
+
     public Level level;
     public Question question;
     public GameObject pauseIcon;
-    public GameObject escapePanel;
     public GameObject languageSelector;
     public GameObject startHackingButton;
     public GameObject hackLoader;
     public GameObject hackButton;
     public GameObject cancelButton;
-    public GameObject codePanel;
     public GameObject lead;
     public TMP_InputField codeField;
     public TMP_Text questionField;
     public TMP_Text keyField;
     public TMP_Text statusField;
-    public GameObject deathPanel;
     public Michsky.UI.Shift.BlurManager blurManager;
 
     private GameObject gate;
