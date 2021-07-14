@@ -91,7 +91,16 @@ public class WebManager
         }
     }
 
-    public IEnumerator RequestAllChapters(System.Action<List<Chapter>,string> callback)
+    
+
+    private string GetApiKey()
+    {
+        Realm realm = Realm.GetInstance();
+        var users = realm.All<GameUser>();
+        return users.Count() > 0 ? users.First().token : "";
+    }
+
+    public IEnumerator RequestAllChapters(System.Action<List<Chapter>, string> callback)
     {
         isLoading = true;
         var token = GetApiKey();
@@ -100,7 +109,7 @@ public class WebManager
             callback(null, "No API KEY Found");
             yield return "";
         }
-        using (UnityWebRequest request = UnityWebRequest.Get(baseUrl+"/chapter/all/"+token))
+        using (UnityWebRequest request = UnityWebRequest.Get(baseUrl + "/chapter/all/" + token))
         {
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
@@ -115,11 +124,18 @@ public class WebManager
         }
     }
 
-    private string GetApiKey()
+    public IEnumerator RequestChapterIntialisation(System.Action<List<Chapter>, string> callback)
     {
-        Realm realm = Realm.GetInstance();
-        var users = realm.All<GameUser>();
-        return users.Count() > 0 ? users.First().token : "";
+        isLoading = true;
+        var token = GetApiKey();
+        if (token.Length <= 0)
+        {
+            if (token.Length <= 0)
+            {
+                callback(null, "No API KEY Found");
+                yield return "";
+            }
+        }
     }
 
     public IEnumerator RequestCodeCompilation(string language,string code,System.Action<CompilationResult,string> callback)

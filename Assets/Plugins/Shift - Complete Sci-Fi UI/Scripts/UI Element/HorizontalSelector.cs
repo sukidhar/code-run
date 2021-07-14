@@ -39,6 +39,7 @@ namespace Michsky.UI.Shift
             public UnityEvent onValueChanged = new UnityEvent();
         }
 
+
         void Start()
         {
             selectorAnimator = gameObject.GetComponent<Animator>();

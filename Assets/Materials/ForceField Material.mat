@@ -51,5 +51,5 @@ Material:
     - _fillTiling: {r: 15, g: 15, b: 15, a: 0}
     - _impactPoint: {r: 0, g: 0, b: 0, a: 0}
     - _impactRippleDirection: {r: 0, g: 0, b: 1, a: 0}
-    - _rimColor: {r: 2, g: 0.2916075, b: 0.052356, a: 0}
+    - _rimColor: {r: 7.999999, g: 1.1727747, b: 0.20942406, a: 0}
     - _rimPower: {r: 1.5, g: 5, b: 0, a: 0}

@@ -143,8 +143,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5.835804, y: 7.058444, z: 0.40554237}
-  m_Center: {x: -1.0713711, y: 4.3879437, z: 7.4908733}
+  m_Size: {x: 5.835804, y: 7.058444, z: 1.02}
+  m_Center: {x: 0, y: 4.3879437, z: 7.4908733}
 --- !u!1 &8305342379470554861
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,10 +202,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bbfdc18927a3480f90c38aaacfab7f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnTriggerEntered:
+    m_PersistentCalls:
+      m_Calls: []
   isUnlocked: 0
   lazers: {fileID: 6974291923664941181}
   lead: {fileID: 0}
-  hackButton: {fileID: 0}
+  hackButtonGroup: {fileID: 0}
+  codePanel: {fileID: 0}
 --- !u!1001 &92808896696519691
 PrefabInstance:
   m_ObjectHideFlags: 0

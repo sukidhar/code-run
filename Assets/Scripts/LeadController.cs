@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.Events;
 using System.Linq;
 using UnityEngine.UI;
 using UnityEngine;
@@ -53,7 +54,10 @@ public class LeadController : MonoBehaviour
     private float inputMovement;
     private float unArmedFaceDirection;
     private float recoilTimer;
-    private bool shoudlLerpToDeath = false;
+    private bool shouldLerpToDeath = false;
+
+    public UnityEvent deathEvent;
+
 
     private int facingSign
     {
@@ -68,6 +72,8 @@ public class LeadController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        isDead = false;
+        shouldLerpToDeath = false;
         materials = GetComponentInChildren<MeshRenderer>().materials;
         animator = GetComponent<Animator>();
         rigidBody = GetComponent<Rigidbody>();
@@ -79,30 +85,29 @@ public class LeadController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (shoudlLerpToDeath)
+        if (shouldLerpToDeath || isDead)
         {
+            deathEvent?.Invoke();
             bool[] visibilities = new bool[materials.Length];
             var i = 0;
-            foreach(var material in materials)
+            foreach (var material in materials)
             {
                 float lerp = Mathf.Lerp(material.GetFloat("_Visibility"), 1, 1.5f * Time.deltaTime);
                 material.SetFloat("_Visibility", lerp);
-                if (lerp > 0.85)
+                if (lerp > 0.85f)
                 {
                     material.SetFloat("_Visibility", 1);
                     visibilities[i] = true;
                 }
                 i++;
             }
-
             if (visibilities.All(x => x))
             {
-                gameObject.SetActive(false);
                 isDead = true;
-                shoudlLerpToDeath = false;
+                shouldLerpToDeath = false;
+                gameObject.SetActive(false);
+                return;
             }
-
-            return;
         }
         else
         {
@@ -129,12 +134,13 @@ public class LeadController : MonoBehaviour
 
             destinationSlider.value = Mathf.Max(0, transform.position.x / finalLeadTransform.position.x);
         }
-        
+
     }
+    
 
     private void LateUpdate()
     {
-        if (shoudlLerpToDeath)
+        if (shouldLerpToDeath)
         {
             return;
         }
@@ -156,7 +162,7 @@ public class LeadController : MonoBehaviour
 
     private void OnAnimatorIK(int layerIndex)
     {
-        if (shoudlLerpToDeath)
+        if (shouldLerpToDeath)
         {
             return;
         }
@@ -171,7 +177,7 @@ public class LeadController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (shoudlLerpToDeath)
+        if (shouldLerpToDeath || isDead)
         {
             rigidBody.velocity = Vector3.zero;
             return;
@@ -322,6 +328,15 @@ public class LeadController : MonoBehaviour
 
     internal void LerpToDeath()
     {
-        shoudlLerpToDeath = true;
+        shouldLerpToDeath = true;
+    }
+
+    public void Respwan(Transform spawnTransform)
+    {
+        isDead = false;
+        gameObject.transform.position = spawnTransform.position + Vector3.up;
+        rigidBody.velocity = Vector3.zero;
+        rigidBody.MoveRotation(Quaternion.Euler(Vector3.back));
+        gameObject.SetActive(true);
     }
 }

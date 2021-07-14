@@ -50,6 +50,10 @@ public class HomeController : MonoBehaviour
     [Header("Campaign Panel Setup")]
     public GameObject chapterGameObject;
     public GameObject chapterListPanel;
+    public GameObject langaugeLoader;
+    public Michsky.UI.Shift.HorizontalSelector languageSelector;
+    private int languageSelectorIndex = 0;
+    private bool shouldUpdateList = false;
 
     
     private Realm _realm;
@@ -79,34 +83,23 @@ public class HomeController : MonoBehaviour
         passwordSupportText.gameObject.SetActive(false);
         signIn = signInButton.gameObject.GetComponent<Button>();
         signIn.interactable = false;
-        LoadChapters();
     }
 
-    private void LoadChapters()
-    {
-        foreach (Transform child in chapterListPanel.transform)
-        {
-            Destroy(child.gameObject);
-        }
-        var storedChapters = _realm.All<Chapter>().ToList();
-        if (storedChapters.Count() > 0)
-        {
-            storedChapters.Sort(new ChapterComparator());
-            AddGameObjectsToChapterListPanel(storedChapters);
-            return;
-        }
-        StartCoroutine(webManager.RequestAllChapters((chapters, error) =>
-        {
-            _realm.Write(() =>
-            {
-                chapters.ForEach(chapter =>
-                {
-                    _realm.Add(chapter, true);
-                });
-            });
-            AddGameObjectsToChapterListPanel(chapters.ToList());
-        }));
-    }
+    //private void LoadChapters()
+    //{
+    //    foreach (Transform child in chapterListPanel.transform)
+    //    {
+    //        Destroy(child.gameObject);
+    //    }
+    //    var storedChapters = _realm.All<Chapter>().ToList();
+    //    if (storedChapters.Count() > 0)
+    //    {
+    //        storedChapters.Sort(new ChapterComparator());
+    //        AddGameObjectsToChapterListPanel(storedChapters);
+    //        return;
+    //    }
+
+    //}
 
     private void OnChapterSelected()
     {
@@ -159,11 +152,51 @@ public class HomeController : MonoBehaviour
         signUpPasswordField.colors = colors;
     }
 
+    string GetLanguage(string language)
+    {
+        switch (language)
+        {
+            case "Python":
+                return "python";
+            case "C":
+                return "clang";
+            case "C++":
+                return "cpp";
+            default:
+                return "none";
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
         signUp.interactable = signUpCheckers.All(check => check) && termsOfUseSwitch.isOn;
         signIn.interactable = isValidSignInEmail && passwordField.text.Length > 0;
+
+        if (languageSelectorIndex != languageSelector.index || shouldUpdateList)
+        {
+            languageSelectorIndex = languageSelector.index;
+            shouldUpdateList = false;
+            foreach (Transform child in chapterListPanel.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            var chapters = _realm.All<Chapter>().ToList().Where(chapter =>
+            {
+                return chapter.language == GetLanguage(languageSelector.itemList[languageSelectorIndex].itemTitle);
+            });
+            AddGameObjectsToChapterListPanel(chapters.ToList());
+        }
+
+
+        if (chapterListPanel.transform.childCount == 0)
+        {
+            langaugeLoader.SetActive(true);
+        }
+        else
+        {
+            langaugeLoader.SetActive(false);
+        }
     }
     public void UserExistsCheck(System.Action<bool> callback)
     {
@@ -178,6 +211,7 @@ public class HomeController : MonoBehaviour
         {
             this.gameUser = users.First();
             DidSetGameUser();
+            shouldUpdateList = true;
         }
         realm.Dispose();
     }
@@ -200,7 +234,22 @@ public class HomeController : MonoBehaviour
                _realm.Write(() =>
                {
                    _realm.Add(gameUser);
-                   timedEvent.StartIEnumerator();
+                   StartCoroutine(webManager.RequestAllChapters((chapters, _error) =>
+                   {
+                       if (_error.Length > 0)
+                       {
+                           return;
+                       }
+                       _realm.Write(() =>
+                       {
+                           chapters.ForEach(chapter =>
+                           {
+                               _realm.Add(chapter, true);
+                           });
+                       });
+                       shouldUpdateList = true;
+                       timedEvent.StartIEnumerator();
+                   }));
                });
            }));
     }
@@ -217,7 +266,22 @@ public class HomeController : MonoBehaviour
               _realm.Write(() =>
               {
                   _realm.Add(gameUser);
-                  timedEvent.StartIEnumerator();
+                  StartCoroutine(webManager.RequestAllChapters((chapters, _error) =>
+                  {
+                      if(_error.Length > 0)
+                      {
+                          return;
+                      }
+                      _realm.Write(() =>
+                      {
+                          chapters.ForEach(chapter =>
+                          {
+                              _realm.Add(chapter, true);
+                          });
+                      });
+                      shouldUpdateList = true;
+                      timedEvent.StartIEnumerator();
+                  }));
               });
         }));
     }

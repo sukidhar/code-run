@@ -12,8 +12,6 @@ public class PanelManager : MonoBehaviour
     public GameObject codePanel;
     public GameObject deathPanel;
 
-
-
     public Level level;
     public Question question;
     public GameObject pauseIcon;
@@ -29,8 +27,11 @@ public class PanelManager : MonoBehaviour
     public TMP_Text statusField;
     public Michsky.UI.Shift.BlurManager blurManager;
 
+    [Header("Respawn Settings")]
+    public Transform spawnPoint;
+
     private GameObject gate;
-    
+
 
     private LeadController leadController;
     private Michsky.UI.Shift.HorizontalSelector languageSelectorScript;
@@ -54,6 +55,8 @@ public class PanelManager : MonoBehaviour
             }
         }));
     }
+
+
     public void onCodeTextChanged(string code)
     {
         startHackingButton.SetActive(code.Length != 0);
@@ -101,6 +104,7 @@ public class PanelManager : MonoBehaviour
             string op = string.Join("\n",result.output);
             if (question.ValidateAnswer(op))
             {
+                spawnPoint = gate.transform;
                 statusField.text = "UNLOCKED";
                 LazerFloor floor = gate.GetComponent<LazerFloor>();
                 if (floor != null)
@@ -115,6 +119,7 @@ public class PanelManager : MonoBehaviour
             }
         }));
     }
+
 
     // Update is called once per frame
     void Update()
@@ -170,6 +175,11 @@ public class PanelManager : MonoBehaviour
     public void QuitChapter()
     {
         //todo: transistion to main menu
+    }
+
+    public void OnRespawnEvent()
+    {
+        leadController.Respwan(spawnPoint.transform);
     }
 }
 

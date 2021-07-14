@@ -1321,7 +1321,7 @@ GameObject:
   - component: {fileID: 36768236}
   - component: {fileID: 36768234}
   m_Layer: 5
-  m_Name: Exit
+  m_Name: Death Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8665,7 +8665,7 @@ GameObject:
   - component: {fileID: 369261599}
   - component: {fileID: 369261598}
   m_Layer: 5
-  m_Name: Cancel
+  m_Name: Retry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8895,6 +8895,17 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 918366761}
         m_MethodName: BlurOutAnim
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1467761231}
+        m_MethodName: OnRespawnEvent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17986,7 +17997,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -10.400391, y: 25.399902}
+  m_AnchoredPosition: {x: -10.400391, y: 25.40039}
   m_SizeDelta: {x: 45, y: 45}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &940018125
@@ -23961,7 +23972,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 895.2605, y: 0}
+  m_AnchoredPosition: {x: 895.1156, y: 0}
   m_SizeDelta: {x: 1000, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1301623169
@@ -27042,21 +27053,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd755e3f18744c37b10db1c7729009e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseIcon: {fileID: 438001314}
   escapePanel: {fileID: 1231277818}
+  codePanel: {fileID: 331647604}
+  deathPanel: {fileID: 36768232}
+  pauseIcon: {fileID: 438001314}
   languageSelector: {fileID: 1505829565}
   startHackingButton: {fileID: 387168382}
   hackLoader: {fileID: 1536684697}
   hackButton: {fileID: 1321366845701424}
   cancelButton: {fileID: 18400393}
-  codePanel: {fileID: 331647604}
   lead: {fileID: 962680825}
   codeField: {fileID: 1809621208}
   questionField: {fileID: 2048669127}
   keyField: {fileID: 363816506}
   statusField: {fileID: 118604531}
-  deathPanel: {fileID: 36768232}
   blurManager: {fileID: 918366761}
+  spawnPoint: {fileID: 1860615731}
 --- !u!1 &1472843806
 GameObject:
   m_ObjectHideFlags: 0
@@ -28964,7 +28976,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 300.9004, y: 51.600098}
+  m_AnchoredPosition: {x: 300.9004, y: 51.59961}
   m_SizeDelta: {x: 521.785, y: 79.692184}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1601371453
@@ -32080,8 +32092,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: ExitGame
+      - m_Target: {fileID: 1467761231}
+        m_MethodName: QuitChapter
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -33814,6 +33826,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1857429220}
   m_CullTransparentMesh: 0
+--- !u!1 &1860615730
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1860615731}
+  m_Layer: 0
+  m_Name: Spawn Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1860615731
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1860615730}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1967845903}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1863645323
 GameObject:
   m_ObjectHideFlags: 0
@@ -35682,6 +35724,7 @@ Transform:
   m_Children:
   - {fileID: 1989340974}
   - {fileID: 1973429921}
+  - {fileID: 1860615731}
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -37238,7 +37281,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 10.400391, y: -20.399902}
+  m_AnchoredPosition: {x: 10.400391, y: -20.40039}
   m_SizeDelta: {x: 45, y: 45}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &2002938613
@@ -42647,6 +42690,61 @@ PrefabInstance:
       propertyPath: finalLeadTransform
       value: 
       objectReference: {fileID: 1973429921}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 918366761}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 36768234}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BlurInAnim
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ModalWindowIn
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8135328430525374069, guid: 87995af27162644548951d5c397eced0,
+        type: 3}
+      propertyPath: deathEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 87995af27162644548951d5c397eced0, type: 3}
 --- !u!1001 &1414801675505978808
