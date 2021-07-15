@@ -65,7 +65,7 @@ public class HomeController : MonoBehaviour
 
     private void OnEnable()
     {
-        //Realm.DeleteRealm(RealmConfiguration.DefaultConfiguration);
+        Realm.DeleteRealm(RealmConfiguration.DefaultConfiguration);
         _realm = Realm.GetInstance();
     }
 
@@ -101,17 +101,37 @@ public class HomeController : MonoBehaviour
 
     //}
 
-    private void OnChapterSelected()
+    private void OnChapterSelected(string chapterId)
     {
         //todo check if the chapter is current chapter and show alert to set async scene operation to coroutine
         splashScreen.GetComponent<Animator>().Play("Loading");
         mainPanels.GetComponent<Animator>().Play("Invisible");
-        StartCoroutine(LoadSceneAsync("Level1"));
+        StartCoroutine(LoadSceneAsync("Level1",chapterId));
     }
 
-    IEnumerator LoadSceneAsync(string scene)
+    IEnumerator LoadSceneAsync(string scene,string chapterId)
     {
-        yield return new WaitForSeconds(1.5f);
+        StartCoroutine(webManager.RequestChapterIntialisation(chapterId, (gates, error) =>
+        {
+            if (error.Length > 0)
+            {
+                Debug.Log(error);
+                return;
+            }
+            var realm = Realm.GetInstance();
+            var chapter = realm.Find<Chapter>(chapterId);
+            var user = realm.All<GameUser>().First();
+            realm.Write(() =>
+            {
+                user.currentChapterID = chapterId;
+                gates.ForEach(gate =>
+                {
+                    chapter.gates.Add(gate);
+                });
+            });
+            print(user.currentChapterID);
+            realm.Dispose();
+        }));
         var loading = SceneManager.LoadSceneAsync(scene);
         while (!loading.isDone)
         {
@@ -132,7 +152,7 @@ public class HomeController : MonoBehaviour
             chapterScript.enableStatus = true;
             chapter.GetComponent<Button>().onClick.AddListener(delegate
             {
-                OnChapterSelected();
+                OnChapterSelected(storedChapter.id);
             });
             chapterScript.statusItem = GetStatusItem(storedChapter);
             chapter.transform.SetParent(chapterListPanel.transform);
@@ -181,11 +201,13 @@ public class HomeController : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
+            var language = GetLanguage(languageSelector.itemList[languageSelectorIndex].itemTitle);
             var chapters = _realm.All<Chapter>().ToList().Where(chapter =>
             {
-                return chapter.language == GetLanguage(languageSelector.itemList[languageSelectorIndex].itemTitle);
+                return chapter.language == language;
             });
             AddGameObjectsToChapterListPanel(chapters.ToList());
+            SetLanguage(language);
         }
 
 
@@ -198,6 +220,16 @@ public class HomeController : MonoBehaviour
             langaugeLoader.SetActive(false);
         }
     }
+
+    private void SetLanguage(string language)
+    {
+        var user = _realm.All<GameUser>().First();
+        _realm.Write(() =>
+        {
+            user.currentLanguage = language;
+        });
+    }
+
     public void UserExistsCheck(System.Action<bool> callback)
     {
         Realm realm = Realm.GetInstance();

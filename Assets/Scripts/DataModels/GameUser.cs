@@ -18,11 +18,16 @@ public class GameUser : RealmObject
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public string level { get; set; }
 
-    public GameUser() { }
-    public GameUser(string nickname,string email,string authenticationCode) {
+    public string currentLanguage = "";
+    public string currentChapterID = "";
+    
+    public GameUser() { }   
+    public GameUser(string nickname,string email,string authenticationCode,string currentLanguage,string currentChapterId) {
         this.token = authenticationCode;
         this.username = nickname;
         this.email = email;
+        this.currentChapterID = currentChapterId;
+        this.currentLanguage = currentLanguage;
     }
 }
 

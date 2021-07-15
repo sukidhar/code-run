@@ -124,7 +124,7 @@ public class WebManager
         }
     }
 
-    public IEnumerator RequestChapterIntialisation(System.Action<List<Chapter>, string> callback)
+    public IEnumerator RequestChapterIntialisation(string chapterId, System.Action<List<Gate>, string> callback)
     {
         isLoading = true;
         var token = GetApiKey();
@@ -134,6 +134,19 @@ public class WebManager
             {
                 callback(null, "No API KEY Found");
                 yield return "";
+            }
+        }
+        using(UnityWebRequest request = UnityWebRequest.Get(baseUrl+"/"+token+"/chapter/"+chapterId+"/gates/getAll"))
+        {
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                callback(null, request.error);
+            }
+            else
+            {
+                GateResult result = JsonConvert.DeserializeObject<GateResult>(request.downloadHandler.text);
+                callback(result.gates, "");
             }
         }
     }

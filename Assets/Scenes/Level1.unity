@@ -739,6 +739,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 1406531449373781095, guid: f5ad39ea73a2d4647890d3306fa9aeb6,
+        type: 3}
+      propertyPath: m_TagString
+      value: gate_02
+      objectReference: {fileID: 0}
     - target: {fileID: 5440218421152949374, guid: f5ad39ea73a2d4647890d3306fa9aeb6,
         type: 3}
       propertyPath: m_Material
@@ -23972,7 +23977,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 895.1156, y: 0}
+  m_AnchoredPosition: {x: 894.973, y: 0}
   m_SizeDelta: {x: 1000, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1301623169
@@ -27057,7 +27062,6 @@ MonoBehaviour:
   codePanel: {fileID: 331647604}
   deathPanel: {fileID: 36768232}
   pauseIcon: {fileID: 438001314}
-  languageSelector: {fileID: 1505829565}
   startHackingButton: {fileID: 387168382}
   hackLoader: {fileID: 1536684697}
   hackButton: {fileID: 1321366845701424}
@@ -27921,12 +27925,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1504647906}
   m_CullTransparentMesh: 0
---- !u!1 &1505829565 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1601132473248214, guid: 399aab7bd3e871e4a86276e6342e6160,
-    type: 3}
-  m_PrefabInstance: {fileID: 1932841579}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1505829572 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224029584821562782, guid: 399aab7bd3e871e4a86276e6342e6160,
@@ -43252,6 +43250,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: SecureEntryFloor
+      objectReference: {fileID: 0}
+    - target: {fileID: 1406531449373781095, guid: f5ad39ea73a2d4647890d3306fa9aeb6,
+        type: 3}
+      propertyPath: m_TagString
+      value: gate_01
       objectReference: {fileID: 0}
     - target: {fileID: 6527110613558841605, guid: f5ad39ea73a2d4647890d3306fa9aeb6,
         type: 3}

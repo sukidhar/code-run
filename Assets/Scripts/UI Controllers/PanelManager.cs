@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
-using Michsky;
+using Realms;
 
 public class PanelManager : MonoBehaviour
 {
@@ -12,10 +13,7 @@ public class PanelManager : MonoBehaviour
     public GameObject codePanel;
     public GameObject deathPanel;
 
-    public Level level;
-    public Question question;
     public GameObject pauseIcon;
-    public GameObject languageSelector;
     public GameObject startHackingButton;
     public GameObject hackLoader;
     public GameObject hackButton;
@@ -29,31 +27,37 @@ public class PanelManager : MonoBehaviour
 
     [Header("Respawn Settings")]
     public Transform spawnPoint;
-
     private GameObject gate;
 
-
+    private Realm _realm;
+    private GameUser user;
+    private Chapter chapter;
     private LeadController leadController;
     private Michsky.UI.Shift.HorizontalSelector languageSelectorScript;
+
+    private void OnEnable()
+    {
+        _realm = Realm.GetInstance();
+        _realm.Refresh();
+    }
+
+    private void OnDisable()
+    {
+        _realm.Dispose();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        languageSelectorScript = languageSelector.GetComponent<Michsky.UI.Shift.HorizontalSelector>();
+        user = _realm.All<GameUser>().First();
+        print(user.email);
+        chapter = _realm.Find<Chapter>(user.currentChapterID);
+        print((chapter == null)+user.currentChapterID);
         leadController = lead.GetComponent<LeadController>();
         codePanel.SetActive(false);
         hackButton.SetActive(true);
         cancelButton.SetActive(false);
         escapePanel.SetActive(false);
-        StartCoroutine(WebManager.Instance.RequestLevelCoroutine("level1", (level, error) => {
-            if (error.Length == 0 && level != null)
-            {
-                this.level = level;
-            }
-            else
-            {
-                Debug.Log(error);
-            }
-        }));
     }
 
 
@@ -67,58 +71,49 @@ public class PanelManager : MonoBehaviour
         codeField.text = "";
         statusField.text = "LOCKED";
         this.gate = gate;
-        question = level.questions.Find((question => question.tag == gate.tag));
-        questionField.text = question.query;
-        keyField.text = question.key;
+        ////var storedGate = chapter.gates.ToList().First(g => gate.CompareTag(g.tag));
+        ////print(storedGate == null);
+        //questionField.text = storedGate.question;
+        //keyField.text = storedGate.key;
     }
 
-    public void OnDeathEvent()
-    {
-
-        //Michsky.UI.Shift.ModalWindowManager manager = deathPanel.GetComponent<Michsky.UI.Shift.ModalWindowManager>();
-        //manager.Start();
-        //manager.ModalWindowIn();
-        //blurManager.BlurInAnim();
-    }
-
-
-    public void CompileCode()
-    {
-        string language = languageSelectorScript.itemList[languageSelectorScript.index].itemTitle;
-        switch (language)
-        {
-            case "Python":
-                language = "python";
-                break;
-            case "C":
-                language = "clang";
-                break;
-            case "C++":
-                language = "cpp";
-                break;
-            default:
-                break;
-        }
-        StartCoroutine(WebManager.Instance.RequestCodeCompilation(language,codeField.text,(result,error)=>
-        {
-            string op = string.Join("\n",result.output);
-            if (question.ValidateAnswer(op))
-            {
-                spawnPoint = gate.transform;
-                statusField.text = "UNLOCKED";
-                LazerFloor floor = gate.GetComponent<LazerFloor>();
-                if (floor != null)
-                {
-                    floor.isUnlocked = true;
-                }
-                leadController.isHacking = false;
-            }
-            else
-            {
-                statusField.text = "LOCKED";
-            }
-        }));
-    }
+    //public void CompileCode()
+    //{
+    //    string language = languageSelectorScript.itemList[languageSelectorScript.index].itemTitle;
+    //    switch (language)
+    //    {
+    //        case "Python":
+    //            language = "python";
+    //            break;
+    //        case "C":
+    //            language = "clang";
+    //            break;
+    //        case "C++":
+    //            language = "cpp";
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //    StartCoroutine(WebManager.Instance.RequestCodeCompilation(language,codeField.text,(result,error)=>
+    //    {
+    //        string op = string.Join("\n",result.output);
+    //        if (question.ValidateAnswer(op))
+    //        {
+    //            spawnPoint = gate.transform;
+    //            statusField.text = "UNLOCKED";
+    //            LazerFloor floor = gate.GetComponent<LazerFloor>();
+    //            if (floor != null)
+    //            {
+    //                floor.isUnlocked = true;
+    //            }
+    //            leadController.isHacking = false;
+    //        }
+    //        else
+    //        {
+    //            statusField.text = "LOCKED";
+    //        }
+    //    }));
+    //}
 
 
     // Update is called once per frame
