@@ -106,12 +106,14 @@ public class WebManager
         var token = GetApiKey();
         if (token.Length <= 0)
         {
+            isLoading = false;
             callback(null, "No API KEY Found");
             yield return "";
         }
         using (UnityWebRequest request = UnityWebRequest.Get(baseUrl + "/chapter/all/" + token))
         {
             yield return request.SendWebRequest();
+            isLoading = false;
             if (request.isNetworkError || request.isHttpError)
             {
                 callback(null, request.error);
@@ -130,15 +132,14 @@ public class WebManager
         var token = GetApiKey();
         if (token.Length <= 0)
         {
-            if (token.Length <= 0)
-            {
-                callback(null, "No API KEY Found");
-                yield return "";
-            }
+            isLoading = false;
+            callback(null, "No API KEY Found");
+            yield return "";
         }
         using(UnityWebRequest request = UnityWebRequest.Get(baseUrl+"/"+token+"/chapter/"+chapterId+"/gates/getAll"))
         {
             yield return request.SendWebRequest();
+            isLoading = false;
             if (request.isNetworkError || request.isHttpError)
             {
                 callback(null, request.error);
@@ -149,24 +150,38 @@ public class WebManager
                 callback(result.gates, "");
             }
         }
+        yield return new WaitForFixedUpdate();
     }
 
-    public IEnumerator RequestCodeCompilation(string language,string code,System.Action<CompilationResult,string> callback)
+
+
+    public IEnumerator RequestCodeCompilation(string language,string gateId,string code,System.Action<bool,string> callback)
     {
         isLoading = true;
-        string url = "http://localhost:5000/" + language;
+        var token = GetApiKey();
+        if (token.Length <= 0)
+        {
+            isLoading = false;
+            callback(false, "No API KEY Found");
+            yield return "";
+        }
+        string url = baseUrl + "/unlock/gate/"+ gateId + "/" + token;
         WWWForm form = new WWWForm();
         form.AddField("code", code);
+        form.AddField("language", language);
         using (UnityWebRequest request = UnityWebRequest.Post(url, form))
         {
             yield return request.SendWebRequest();
             isLoading = false;
             if (request.isNetworkError || request.isHttpError)
-                callback(null, request.error);
+            {
+                Debug.Log(request.error);
+                callback(false, request.error);
+            }
             else
             {
                 Debug.Log(request.downloadHandler.text);
-                CompilationResult result = JsonConvert.DeserializeObject<CompilationResult>(request.downloadHandler.text);
+                var result = request.downloadHandler.text.ToLower() == "true";
                 callback(result, "");
             }
         }

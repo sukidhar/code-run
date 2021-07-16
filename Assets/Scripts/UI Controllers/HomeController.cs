@@ -83,55 +83,36 @@ public class HomeController : MonoBehaviour
         passwordSupportText.gameObject.SetActive(false);
         signIn = signInButton.gameObject.GetComponent<Button>();
         signIn.interactable = false;
-    }
-
-    //private void LoadChapters()
-    //{
-    //    foreach (Transform child in chapterListPanel.transform)
-    //    {
-    //        Destroy(child.gameObject);
-    //    }
-    //    var storedChapters = _realm.All<Chapter>().ToList();
-    //    if (storedChapters.Count() > 0)
-    //    {
-    //        storedChapters.Sort(new ChapterComparator());
-    //        AddGameObjectsToChapterListPanel(storedChapters);
-    //        return;
-    //    }
-
-    //}
-
-    private void OnChapterSelected(string chapterId)
-    {
-        //todo check if the chapter is current chapter and show alert to set async scene operation to coroutine
-        splashScreen.GetComponent<Animator>().Play("Loading");
-        mainPanels.GetComponent<Animator>().Play("Invisible");
-        StartCoroutine(LoadSceneAsync("Level1",chapterId));
+        emailField.text = "sukidhar@gmail.com";
+        passwordField.text = "Suki@1329";
     }
 
     IEnumerator LoadSceneAsync(string scene,string chapterId)
     {
-        StartCoroutine(webManager.RequestChapterIntialisation(chapterId, (gates, error) =>
+        yield return webManager.RequestChapterIntialisation(chapterId, (gates, error) =>
         {
             if (error.Length > 0)
             {
                 Debug.Log(error);
                 return;
             }
-            var realm = Realm.GetInstance();
-            var chapter = realm.Find<Chapter>(chapterId);
-            var user = realm.All<GameUser>().First();
-            realm.Write(() =>
+            var user = _realm.All<GameUser>().First();
+            user.SetChapterID(chapterId);
+            var chapter = _realm.Find<Chapter>(chapterId);
+            _realm.Write(() =>
             {
-                user.currentChapterID = chapterId;
-                gates.ForEach(gate =>
+                chapter.gates.Clear();
+                foreach (var gate in gates)
                 {
+                    var t_gate = _realm.Find<Gate>(gate.id);
+                    if (t_gate != null)
+                    {
+                        _realm.Remove(t_gate);
+                    }
                     chapter.gates.Add(gate);
-                });
+                }
             });
-            print(user.currentChapterID);
-            realm.Dispose();
-        }));
+        });
         var loading = SceneManager.LoadSceneAsync(scene);
         while (!loading.isDone)
         {
@@ -150,9 +131,10 @@ public class HomeController : MonoBehaviour
             chapterScript.buttonDescription = storedChapter.description;
             chapterScript.id = storedChapter.id;
             chapterScript.enableStatus = true;
-            chapter.GetComponent<Button>().onClick.AddListener(delegate
-            {
-                OnChapterSelected(storedChapter.id);
+            chapter.GetComponent<Button>().onClick.AddListener(()=> {
+                splashScreen.GetComponent<Animator>().Play("Loading");
+                mainPanels.GetComponent<Animator>().Play("Invisible");
+                StartCoroutine(LoadSceneAsync("Level1", storedChapter.id));
             });
             chapterScript.statusItem = GetStatusItem(storedChapter);
             chapter.transform.SetParent(chapterListPanel.transform);
@@ -288,6 +270,7 @@ public class HomeController : MonoBehaviour
 
     public void OnLoginClicked()
     {
+
         StartCoroutine(webManager.RequestLogin(emailField.text, passwordField.text, (gameUser, error) =>
         {
               if (error.Length > 0)
@@ -317,32 +300,6 @@ public class HomeController : MonoBehaviour
               });
         }));
     }
-    //public void OnNewGameButtonClicked()
-    //{
-    //    foreach (Transform child in chapterListPanel.transform)
-    //    {
-    //        Destroy(child.gameObject);
-    //    }
-    //    mpm.OpenPanel(TabPanel.Campaign.ToString());
-    //    var storedChapters = _realm.All<Chapter>().ToList();
-    //    if (storedChapters.Count() > 0)
-    //    {
-    //        storedChapters.Sort(new ChapterComparator());
-    //        AddGameObjectsToChapterListPanel(storedChapters);
-    //        return;
-    //    }
-    //    StartCoroutine(webManager.RequestAllChapters((chapters, error) =>
-    //    {
-    //        _realm.Write(() =>
-    //        {
-    //            chapters.ForEach(chapter =>
-    //            {
-    //                _realm.Add(chapter, true);
-    //            });
-    //        });
-    //        AddGameObjectsToChapterListPanel(chapters.ToList());
-    //    }));
-    //}
 
 
 

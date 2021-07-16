@@ -16,8 +16,7 @@ public class Chapter : RealmObject
     public string status { get; set; }
     public string language { get; set; }
 
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-    public IList<Gate> gates = new List<Gate>();
+    public IList<Gate> gates { get; }
      
     public Chapter() { }
     public Chapter(string id, string title, string description,int order,string langauge) {
@@ -37,6 +36,7 @@ public class Gate : RealmObject
     public string question { get; set; }
     public string key { get; set; }
     public string tag { get; set; }
+    public int exp { get; set; }
     public bool isCheckPoint { get; set; }
 
     public Gate() { }

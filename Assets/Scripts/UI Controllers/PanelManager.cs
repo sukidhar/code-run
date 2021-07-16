@@ -25,6 +25,12 @@ public class PanelManager : MonoBehaviour
     public TMP_Text statusField;
     public Michsky.UI.Shift.BlurManager blurManager;
 
+    [Header("UI Manager")]
+    public Michsky.UI.Shift.UIManager UIManager;
+    [Header("Error Settings")]
+    public TMP_FontAsset errorFont;
+
+
     [Header("Respawn Settings")]
     public Transform spawnPoint;
     private GameObject gate;
@@ -32,13 +38,13 @@ public class PanelManager : MonoBehaviour
     private Realm _realm;
     private GameUser user;
     private Chapter chapter;
+    private Gate currentGate;
     private LeadController leadController;
     private Michsky.UI.Shift.HorizontalSelector languageSelectorScript;
 
     private void OnEnable()
     {
         _realm = Realm.GetInstance();
-        _realm.Refresh();
     }
 
     private void OnDisable()
@@ -50,9 +56,7 @@ public class PanelManager : MonoBehaviour
     void Start()
     {
         user = _realm.All<GameUser>().First();
-        print(user.email);
         chapter = _realm.Find<Chapter>(user.currentChapterID);
-        print((chapter == null)+user.currentChapterID);
         leadController = lead.GetComponent<LeadController>();
         codePanel.SetActive(false);
         hackButton.SetActive(true);
@@ -71,49 +75,56 @@ public class PanelManager : MonoBehaviour
         codeField.text = "";
         statusField.text = "LOCKED";
         this.gate = gate;
-        ////var storedGate = chapter.gates.ToList().First(g => gate.CompareTag(g.tag));
-        ////print(storedGate == null);
-        //questionField.text = storedGate.question;
-        //keyField.text = storedGate.key;
+        currentGate = chapter.gates.ToList().First(g => gate.CompareTag(g.tag));
+        questionField.text = currentGate.question;
+        keyField.text = currentGate.key;
     }
 
-    //public void CompileCode()
-    //{
-    //    string language = languageSelectorScript.itemList[languageSelectorScript.index].itemTitle;
-    //    switch (language)
-    //    {
-    //        case "Python":
-    //            language = "python";
-    //            break;
-    //        case "C":
-    //            language = "clang";
-    //            break;
-    //        case "C++":
-    //            language = "cpp";
-    //            break;
-    //        default:
-    //            break;
-    //    }
-    //    StartCoroutine(WebManager.Instance.RequestCodeCompilation(language,codeField.text,(result,error)=>
-    //    {
-    //        string op = string.Join("\n",result.output);
-    //        if (question.ValidateAnswer(op))
-    //        {
-    //            spawnPoint = gate.transform;
-    //            statusField.text = "UNLOCKED";
-    //            LazerFloor floor = gate.GetComponent<LazerFloor>();
-    //            if (floor != null)
-    //            {
-    //                floor.isUnlocked = true;
-    //            }
-    //            leadController.isHacking = false;
-    //        }
-    //        else
-    //        {
-    //            statusField.text = "LOCKED";
-    //        }
-    //    }));
-    //}
+    bool ValidateAnswer(string op)
+    {
+        return currentGate.key.Equals(op);
+    }
+
+    private IEnumerator Wait(float time,System.Action callback)
+    {
+        yield return new WaitForSeconds(time);
+        callback();
+    }
+
+    public void CompileCode()
+    {
+        StartCoroutine(WebManager.Instance.RequestCodeCompilation(user.currentLanguage,currentGate.id, codeField.text, (result, error) =>
+          {
+              if (error.Length > 0 || !result)
+              {
+                  var defaultFont = statusField.font;
+                  statusField.text = "ERROR";
+                  statusField.font = errorFont;
+                  var defaultColor = UIManager.primaryColor;
+                  UIManager.primaryColor = UIManager.negativeColor;
+                  StartCoroutine(Wait(1.5f,()=>
+                  {
+                      statusField.text = "LOCKED";
+                      statusField.font = defaultFont;
+                      UIManager.primaryColor = defaultColor;
+                  }));
+                  return;
+              }
+              
+              if (result)
+              {
+                  spawnPoint = gate.transform;
+                  spawnPoint.position += Vector3.right * 15;
+                  statusField.text = "UNLOCKED";
+                  LazerFloor floor = gate.GetComponent<LazerFloor>();
+                  if (floor != null)
+                  {
+                      floor.isUnlocked = true;
+                  }
+                  leadController.isHacking = false;
+              }
+          }));
+    }
 
 
     // Update is called once per frame

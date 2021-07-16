@@ -13,13 +13,15 @@ public class GameUser : RealmObject
     public string username { get; set; }
     public string email { get; set; }
     public string token { get; set; }
-
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    public string currentLanguage { get; set; }
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    public string currentChapterID { get; set; }
     [DefaultValue("0")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
     public string level { get; set; }
 
-    public string currentLanguage = "";
-    public string currentChapterID = "";
+
     
     public GameUser() { }   
     public GameUser(string nickname,string email,string authenticationCode,string currentLanguage,string currentChapterId) {
@@ -28,6 +30,16 @@ public class GameUser : RealmObject
         this.email = email;
         this.currentChapterID = currentChapterId;
         this.currentLanguage = currentLanguage;
+    }
+
+    public void SetChapterID(string chapterid)
+    {
+        var realm = Realm.GetInstance();
+        realm.Write(() =>
+        {
+            this.currentChapterID = chapterid;
+        });
+        realm.Dispose();
     }
 }
 

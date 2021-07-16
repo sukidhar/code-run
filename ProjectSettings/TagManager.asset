@@ -6,6 +6,7 @@ TagManager:
   tags:
   - gate_01
   - gate_02
+  - gate_03
   layers:
   - Default
   - TransparentFX

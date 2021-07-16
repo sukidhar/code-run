@@ -94,7 +94,7 @@ Material:
     m_Colors:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _EnvMatrixRotation: {r: 0, g: 0, b: 0, a: 0}
-    - _FaceColor: {r: 0, g: 17.932848, b: 18.958925, a: 1}
+    - _FaceColor: {r: 37.917862, g: 0, b: 0, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -112,11 +112,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
-  m_Name: CONSOLA SDF
+  m_Name: CONSOLA ERROR SDF
   m_EditorClassIdentifier: 
-  hashCode: 504193762
+  hashCode: 1014779002
   material: {fileID: -7426698764869237052}
-  materialHashCode: 1980649474
+  materialHashCode: -1182189926
   m_Version: 1.1.0
   m_SourceFontFileGUID: b11a10ec452764d838a25ee1919aecd6
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: b11a10ec452764d838a25ee1919aecd6,
