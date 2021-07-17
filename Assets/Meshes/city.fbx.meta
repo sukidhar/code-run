@@ -3,7 +3,17 @@ guid: 28bd91f15b0124ca3a09fe3e21863014
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Base Color
+    second: {fileID: 2100000, guid: a3dbcfd0248f24f24b117785522a6580, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: HighLights
+    second: {fileID: 2100000, guid: a633ef0a414ee4534b4dd15743064ca5, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

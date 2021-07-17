@@ -65,7 +65,7 @@ public class HomeController : MonoBehaviour
 
     private void OnEnable()
     {
-        Realm.DeleteRealm(RealmConfiguration.DefaultConfiguration);
+        //Realm.DeleteRealm(RealmConfiguration.DefaultConfiguration);
         _realm = Realm.GetInstance();
     }
 

@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour
         controller = lead.GetComponent<LeadController>();
     }
     // Update is called once per frame
-    void LateUpdate()
+    void FixedUpdate()
     {
         if (lead.transform != null)
         {
